@@ -3,12 +3,12 @@ Assignment 5 readme File
 ------------------------------------------------------------------------
 Student 1: What is your name?
 
-
+Connie An
 
 ------------------------------------------------------------------------
 Student 2: What is your name?
 
-
+Anthony Ng
 
 ------------------------------------------------------------------------
 How many late days are you using on this assignment?
@@ -81,7 +81,39 @@ particular, what bugs are in your submission?
 ------------------------------------------------------------------------
 What is your mywc program test plan?
 
+Boundary Tests:
+ mywc1.txt   Has no text inside. Tests the lower boundary of the program
 
+Statement Tests:
+ mywc1.txt   In the mywc.c file, skips the while loop since first char
+             is EOF.
+ mywc10.txt  Goes into the while loop since first character isn't EOF.
+             Goes into if statment on line 34 because first character
+	     is a space. Skips if statement on line 36 because iInWord
+	     is FALSE.
+ mywc11.txt  Goes into the while loop since first character isn't EOF.
+             Skips if statement on line 34 because first character is
+	     not a space and goes to else. Goes into if statement on
+	     line 44 because iInWord = FALSE.
+ mywc12.txt  Files include a newline. Tests if statement on line 48.
+             Previous files included no newlines, and they skip this
+	     if statement.
+ mywc13.txt  File ends outside a word (with a space). Skips if
+             statement on line 52.
+ mywc14.txt  File ends inside a word. Goes into if statement on line 52
+ mywc15.txt  File with multiple lines, words, and characters. Tests if
+             statement on line 36.
+
+Stress Tests:
+ mywc20.txt  File with random, printable ascii characters. This is a
+             more irregular and unusual test case.
+ mywc21.txt  File with 50,000 characters. This tests the upper limit of
+             the number of characters there are.
+ mywc22.txt  File with 1000 lines. This tests the upper limit of the
+             number of lines there are.
+ mywc23.txt  File with 25,000 words (every other character is a space
+             or newline). Tests the upper limit of the number of
+	     words there are.
 
 ------------------------------------------------------------------------
 What are the CPU times consumed by the programs from Parts 2a, 2b, 2d,
@@ -96,7 +128,3 @@ Part 2d:  _____ seconds
 Part 2e:  _____ seconds
 
 Part 2f:  _____ seconds
-
-
-
-
