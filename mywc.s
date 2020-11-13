@@ -27,20 +27,19 @@ iInWord:
 
 iChar:
         .skip 4
-cChar:
-        .skip 1
 
 //---------------------------------------------------------------------
 
         .section .text
 
         .equ FALSE, 0
-        .equ TRUE, 0
+        .equ TRUE, 1
+        
         // Must be a multiple of 16
         .equ    MAIN_STACK_BYTECOUNT, 16
 
         .global main
-        
+main:  
 // Write to stdout counts of how many lines, words, and characters
 //   are in stdin. A word is a sequence of non-whitespace characters.
 //   Whitespace is defined by the isspace() function. Return 0. 
@@ -49,62 +48,62 @@ cChar:
         sub     sp, sp, MAIN_STACK_BYTECOUNT
         str     x30, [sp]
 
-        adr     w1, iChar
-        ldr     w1, [w1]
-        adr     x2, lCharCount
-        ldr     x2, [x2]
-        adr     w3, iInWord
-        ldr     w3, [w3]
-        adr     x4, lWordCount
-        ldr     x4, [w4]
-        adr     x5, lLineCount
-        ldr     x5, [x5]
+        adr     x21, iChar
+        ldr     w21, [x21]
+        adr     x22, lCharCount
+        ldr     x22, [x22]
+        adr     x23, iInWord
+        ldr     w23, [x23]
+        adr     x24, lWordCount
+        ldr     x24, [x24]
+        adr     x25, lLineCount
+        ldr     x25, [x25]
         
 loop1:
         // if((iChar = getchar()) == EOF) goto endloop1;
         // iChar = (char)getchar()
         bl      getchar
-        str     w1, w0
-        cmp     w1, -1
+        mov     w21, w0
+        cmp     w21, -1
         beq     endloop1
 
         //lCharCount++;
-        add     x2, x2, 1
+        add     x22, x22, 1
 
         //if(!isspace(iChar)) goto else1 ;
-        mov     x0, x1
-        bl      isSpace
-        cmp     x0, 0
+        mov     w0, w21
+        bl      isspace
+        cmp     w0, 0
         beq     else1
 
         //if(!iInWord) goto endif2 ;
-        cmp     x3, 0
+        cmp     x23, 0
         beq     endif2
 
         //lWordCount++;
-        add     x4, x4, 1
+        add     x24, x24, 1
 
         //iInWord = FALSE;
-        mov     w3, FALSE
+        mov     w23, FALSE
         
 endif2:
         b       endif1
 else1:
         //if(iInWord) goto endif3;
-        cmp     w3, 1
+        cmp     w23, 1
         beq     endif3
      
         //iInWord = TRUE;
-        mov     iInWord, TRUE
+        mov     x23, TRUE
         
 endif3:
 endif1:
         //if(iChar != '\n') goto endif4;
-        cmp     w1, 10
+        cmp     w21, 10
         bne     endif4
         
         //lLineCount++;
-        add     x5, x5, 1
+        add     x25, x25, 1
 endif4:
         b       loop1
 endloop1:
@@ -144,23 +143,18 @@ int main(void)
 }
         */
         //if(!iInWord) goto endif5;
-        cmp     w3, 0
+        cmp     w23, 0
         beq     endif5
         //lWordCount++;
-        add     x4, x4, 1
+        add     x24, x24, 1
 
-        str     x2, lCharCount
-        str     x4, lWordCount
-        str     x5, lLineCount
-endif5: 
+endif5:
+        
         // printf("%7ld %7ld %7ld\n", lLineCount, lWordCount, lCharCount);
-        adr     x0, printingString
-        adr     x1, lLineCount
-        ldr     x1, [x1]
-        adr     x2, lWordCount
-        ldr     x2, [x2]
-        adr     x3, lCharCount
-        ldr     x3, [x3]
+        adr     x0, printingStr
+        mov     x1, x25
+        mov     x2, x24
+        mov     x3, x22
         bl      printf
         
         // Epilog and return 0
