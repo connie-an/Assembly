@@ -33,10 +33,8 @@ BigInt_larger:
         str     x30, [sp]
 
         //lLength1 = X0, lLength2 = X1, return address = X30
-        str     x30, [sp]
         str     x0, [sp, LLENGTH1]  //lLength1
         str     x1, [sp, LLENGTH2] //lLength2
-        str     x2, [sp, LLARGER] //lLarger
         
         // if (lLength1 <= lLength2) goto else1;
         cmp     x0, x1
@@ -111,7 +109,7 @@ BigInt_add:
         mov     x2, x0
         mov     x1, 0
         ldr     x0, [sp, OSUM]
-        ldr     x0, [x0, AULDIGITS]
+        add     x0, x0, AULDIGITS
         bl      memset
 endif2:
       
@@ -158,7 +156,7 @@ endif3:
         // ulSum += oAddend2->aulDigits[lIndex];
         ldr     x0, [sp, OADDEND2]
         add     x0, x0, AULDIGITS
-        str     x1, [sp, LINDEX]
+        ldr     x1, [sp, LINDEX]
         ldr     x0, [x0, x1, lsl 3]
         ldr     x1, [sp, ULSUM]
         add     x1, x1, x0
@@ -215,6 +213,7 @@ endif5:
         // Set the length of the sum. 
         // oSum->lLength = lSumLength;
         ldr     x0, [sp, OSUM]
+        ldr     x0, [x0]
         ldr     x1, [sp, LSUMLENGTH]
         str     x1, [x0]
         // return TRUE
