@@ -90,7 +90,7 @@ BigInt_add:
         ldr     x0, [x0]
         ldr     x1, [sp, OADDEND2]
         ldr     x1, [x1]
-        b       BigInt_larger
+        bl      BigInt_larger
         str     x0, [sp, LSUMLENGTH]
 
         // Clear oSum's array if necessary. 
@@ -135,7 +135,7 @@ loop1:
         // ulSum += oAddend1->aulDigits[lIndex];
         ldr     x0, [sp, OADDEND1]
         add     x0, x0, AULDIGITS
-        str     x1, [sp, LINDEX]
+        ldr     x1, [sp, LINDEX]
         ldr     x0, [x0, x1, lsl 3]
         ldr     x1, [sp, ULSUM]
         add     x1, x1, x0
@@ -149,8 +149,6 @@ loop1:
         // ulCarry = 1;
         mov     x0, 1
         str     x0, [sp, ULCARRY]
-        // goto loop1;
-        b       loop1
 endif3:
   
         // ulSum += oAddend2->aulDigits[lIndex];
@@ -182,6 +180,7 @@ endif4:
         ldr     x0, [sp, LINDEX]
         add     x0, x0, 1
         str     x0, [sp, LINDEX]
+        b       loop1
 endloop1:
 
         // Check for a carry out of the last "column" of the addition. 
@@ -213,7 +212,6 @@ endif5:
         // Set the length of the sum. 
         // oSum->lLength = lSumLength;
         ldr     x0, [sp, OSUM]
-        ldr     x0, [x0]
         ldr     x1, [sp, LSUMLENGTH]
         str     x1, [x0]
         // return TRUE
