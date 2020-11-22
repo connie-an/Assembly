@@ -100,11 +100,14 @@ endif2:
         mov     ULCARRY, 0
         // lIndex = 0;
         mov     LINDEX, 0
-loop1:
-        
-        // if(lIndex >= lSumLength) goto endloop1;
+
         cmp     LINDEX, LSUMLENGTH
         bge     endloop1
+loop1:
+        
+        //if(lIndex >= lSumLength) goto endloop1;
+        //cmp     LINDEX, LSUMLENGTH
+        //bge     endloop1
         // ulSum = ulCarry;
         mov     ULSUM, ULCARRY
         // ulCarry = 0;
@@ -146,7 +149,10 @@ endif4:
         
         //lIndex++;
         add     LINDEX, LINDEX, 1
-        b       loop1
+        //b       loop1
+
+        cmp     LINDEX, LSUMLENGTH
+        blt     loop1
 endloop1:
 
         // Check for a carry out of the last "column" of the addition. 
