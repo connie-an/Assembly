@@ -110,26 +110,22 @@ BigInt_add:
       
         // Determine the larger length. 
         // lSumLength = BigInt_larger(oAddend1->lLength, oAddend2->lLength);
-        mov     x0, OADDEND1 
-        ldr     x0, [x0]
-        mov     x1, OADDEND2
-        ldr     x1, [x1]
+        ldr     x0, [OADDEND1]
+        ldr     x1, [OADDEND2]
         bl      BigInt_larger
         mov     LSUMLENGTH, x0
 
         // Clear oSum's array if necessary. 
         // if (oSum->lLength <= lSumLength) goto endif2;
-        mov     x0, OSUM
-        ldr     x0, [x0]
+        ldr     x0, [OSUM]
         cmp     x0, LSUMLENGTH
         ble     endif2
 
         //memset(oSum->aulDigits, 0, MAX_DIGITS * sizeof(unsigned long));
         // sizeof(unsigned long);
-        mov     x0, SIZE_OF_UNSIGNED_LONG
+        mov     x2, SIZE_OF_UNSIGNED_LONG
         mov     x1, MAX_DIGITS
-        mul     x0, x0, x1
-        mov     x2, x0
+        mul     x2, x2, x1
         mov     x1, 0
         mov     x0, OSUM
         add     x0, x0, AULDIGITS
@@ -222,8 +218,7 @@ endif6:
 endif5:
         // Set the length of the sum. 
         // oSum->lLength = lSumLength;
-        mov     x0, OSUM
-        str     LSUMLENGTH, [x0]
+        str     LSUMLENGTH, [OSUM]
         // return TRUE
         mov     x0, TRUE
         ldr     x30, [sp] // Restore x30
