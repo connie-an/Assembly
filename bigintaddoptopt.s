@@ -55,7 +55,6 @@ BigInt_add:
         str     x23, [sp, 40]
         str     x24, [sp, 48]
         str     x25, [sp, 56]
-        str     x26, [sp, 64]
 
         // x0 = BigInt_T oAddend1, x1 = BigInt_T oAddend2,
         // x2 = BigInt_T oSum
@@ -96,35 +95,41 @@ endif1:
 endif2:
       
         // Perform the addition.
-        // ulCarry = 0; [sp, 32]
-        mov     ULCARRY, 0
+        // ulCarry = 0;
+        //mov    x1, 1
+        //adds   x1, x1, 0
+       
         // lIndex = 0;
         mov     LINDEX, 0
 
         cmp     LINDEX, LSUMLENGTH
-        bge     endloop1
+        bge     endif5
+
+        mov     ULSUM, 0
 loop1:
         
         //if(lIndex >= lSumLength) goto endloop1;
         //cmp     LINDEX, LSUMLENGTH
         //bge     endloop1
+
         // ulSum = ulCarry;
-        mov     ULSUM, ULCARRY
+        
         // ulCarry = 0;
-        mov     ULCARRY, 0
+//        mov     x0, 1
+  //      adds    x0, x0, 0
         // ulSum += oAddend1->aulDigits[lIndex];
         mov     x0, OADDEND1
         add     x0, x0, AULDIGITS
         mov     x1, LINDEX
         ldr     x0, [x0, x1, lsl 3]
-        add     ULSUM, ULSUM, x0
+        adcs    ULSUM, ULSUM, x0
         
         // if (ulSum >= oAddend1->aulDigits[lIndex]) goto endif3;
         // Check for overflow.
-        cmp     ULSUM, x0
-        bhs     endif3
+       // cmp     ULSUM, x0
+       // bhs     endif3
         // ulCarry = 1;
-        mov     ULCARRY, 1
+        // mov     ULCARRY, 1
 endif3:
   
         // ulSum += oAddend2->aulDigits[lIndex];
@@ -132,13 +137,13 @@ endif3:
         add     x0, x0, AULDIGITS
         mov     x1, LINDEX
         ldr     x0, [x0, x1, lsl 3]
-        add     ULSUM, ULSUM, x0
+        adcs     ULSUM, ULSUM, x0
         // if (ulSum >= oAddend2->aulDigits[lIndex]) goto endif4;
         // Check for overflow.
-        cmp     ULSUM, x0
-        bhs     endif4
+       // cmp     ULSUM, x0
+       // bhs     endif4
         //ulCarry = 1;
-        mov     ULCARRY, 1
+        // mov     ULCARRY, 1
 endif4:
         
         // oSum->aulDigits[lIndex] = ulSum;
@@ -151,13 +156,17 @@ endif4:
         add     LINDEX, LINDEX, 1
         //b       loop1
 
+        // ulsum = ulcarry
+        mov     ULSUM, 0
+        adcs    ULSUM, ULSUM, xzr
+
         cmp     LINDEX, LSUMLENGTH
         blt     loop1
 endloop1:
 
         // Check for a carry out of the last "column" of the addition. 
         // if (ulCarry != 1) goto endif5;
-        cmp     ULCARRY, 1
+        cmp     ULSUM, 1
         bne     endif5
         // if (lSumLength != MAX_DIGITS) goto endif6;
         cmp     LSUMLENGTH, MAX_DIGITS
