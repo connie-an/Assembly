@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------
-// bigintadd.s
+// bigintaddoptopt.s
 // Author: Connie An, Anthony Ng
 //---------------------------------------------------------------------
 
@@ -35,9 +35,7 @@
         OADDEND1   .req x19
         OADDEND2   .req x20
         OSUM       .req x21
-
         // Local Variable Registers
-        ULCARRY    .req x22
         ULSUM      .req x23
         LINDEX     .req x24
         LSUMLENGTH .req x25
@@ -51,7 +49,6 @@ BigInt_add:
         str     x19, [sp, 8]
         str     x20, [sp, 16]
         str     x21, [sp, 24]
-        str     x22, [sp, 32]
         str     x23, [sp, 40]
         str     x24, [sp, 48]
         str     x25, [sp, 56]
@@ -64,8 +61,8 @@ BigInt_add:
       
         // Determine the larger length. 
         // lSumLength = BigInt_larger(oAddend1->lLength, oAddend2->lLength);
-        ldr     x0, [OADDEND1]
-        ldr     x1, [OADDEND2]
+        ldr     x0, [x0]
+        ldr     x1, [x1]
         // if (lLength1 <= lLength2) goto else1;
         cmp     x0, x1
         ble     else1
@@ -106,6 +103,7 @@ endif2:
         bge     endif5
 
         mov     ULSUM, 0
+       
 loop1:
         
         //if(lIndex >= lSumLength) goto endloop1;
@@ -115,33 +113,42 @@ loop1:
         // ulSum = ulCarry;
         
         // ulCarry = 0;
-//        mov     x0, 1
-  //      adds    x0, x0, 0
+        //mov     x0, 1
+        //adds    x0, x0, 0
         // ulSum += oAddend1->aulDigits[lIndex];
         mov     x0, OADDEND1
         add     x0, x0, AULDIGITS
         mov     x1, LINDEX
         ldr     x0, [x0, x1, lsl 3]
-        adcs    ULSUM, ULSUM, x0
+        adcs    ULSUM, ULSUM, x0 
         
         // if (ulSum >= oAddend1->aulDigits[lIndex]) goto endif3;
         // Check for overflow.
-       // cmp     ULSUM, x0
-       // bhs     endif3
+        // cmp     ULSUM, x0
+        // bhs     endif3
         // ulCarry = 1;
         // mov     ULCARRY, 1
-endif3:
-  
+endif3: 
+
         // ulSum += oAddend2->aulDigits[lIndex];
+        bcs     yescarry
         mov     x0, OADDEND2
         add     x0, x0, AULDIGITS
         mov     x1, LINDEX
         ldr     x0, [x0, x1, lsl 3]
-        adcs     ULSUM, ULSUM, x0
+        adcs    ULSUM, ULSUM, x0
+        b       endyescarry
+yescarry:
+        mov     x0, OADDEND2
+        add     x0, x0, AULDIGITS
+        mov     x1, LINDEX
+        ldr     x0, [x0, x1, lsl 3]
+        add     ULSUM, ULSUM, x0
+endyescarry:    
         // if (ulSum >= oAddend2->aulDigits[lIndex]) goto endif4;
         // Check for overflow.
-       // cmp     ULSUM, x0
-       // bhs     endif4
+        // cmp     ULSUM, x0
+        // bhs     endif4
         //ulCarry = 1;
         // mov     ULCARRY, 1
 endif4:
@@ -159,7 +166,8 @@ endif4:
         // ulsum = ulcarry
         mov     ULSUM, 0
         adcs    ULSUM, ULSUM, xzr
-
+       
+        
         cmp     LINDEX, LSUMLENGTH
         blt     loop1
 endloop1:
@@ -177,7 +185,6 @@ endloop1:
         ldr     x19, [sp, 8]
         ldr     x20, [sp, 16]
         ldr     x21, [sp, 24]
-        ldr     x22, [sp, 32]
         ldr     x23, [sp, 40]
         ldr     x24, [sp, 48]
         ldr     x25, [sp, 56]
@@ -203,7 +210,6 @@ endif5:
         ldr     x19, [sp, 8]
         ldr     x20, [sp, 16]
         ldr     x21, [sp, 24]
-        ldr     x22, [sp, 32]
         ldr     x23, [sp, 40]
         ldr     x24, [sp, 48]
         ldr     x25, [sp, 56]
